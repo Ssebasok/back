@@ -20,6 +20,12 @@ class profileController extends Controller
         // Obtener detalles de las deudas
         $debts = $this->getUserDebts($userId);
         
+        // Calcular total de ingresos por usuario ID
+        $totalIncome = $this->calculateTotalIncomeByUserId($userId);
+        
+        // Obtener detalles de los ingresos
+        $incomes = $this->getUserIncome($userId);
+        
         return response()->json([
             'success' => 1,
             'message' => 'Datos del perfil obtenidos exitosamente',
@@ -31,7 +37,10 @@ class profileController extends Controller
             'financial_data' => [
                 'total_debt' => $totalDebt,
                 'debt_count' => count($debts),
-                'debts' => $debts
+                'debts' => $debts,
+                'total_income' => $totalIncome,
+                'income_count' => count($incomes),
+                'incomes' => $incomes
             ]
         ]);
     }
@@ -45,6 +54,7 @@ class profileController extends Controller
             // Calcular el total de deudas pendientes del usuario
             $totalDebt = DB::table('debts')
                 ->where('user_id', $userId)
+                ->where('deb', '1')
                 ->where('status', 'PENDING')
                 ->sum('amount');
             
@@ -65,6 +75,7 @@ class profileController extends Controller
             $debts = DB::table('debts')
                 ->where('user_id', $userId)
                 ->where('status', 'PENDING')
+                ->where('deb', '1')
                 ->select('id', 'description', 'amount', 'due_date', 'status')
                 ->orderBy('due_date', 'asc')
                 ->get();
@@ -75,4 +86,35 @@ class profileController extends Controller
             return [];
         }
     }
+
+
+    private function calculateTotalIncomeByUserId($userId)
+    {
+        try {
+            $totalIncome = DB::table('debts')
+                ->where('user_id', $userId)
+                ->where('deb', '0')
+                ->sum('amount');
+            return $totalIncome;
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    private function getUserIncome($userId)
+    {
+        try {
+            $incomes = DB::table('debts')
+                ->where('user_id', $userId)
+                ->where('deb', '0')
+                ->select('id', 'description', 'amount', 'due_date', 'status')
+                ->orderBy('due_date', 'asc')
+                ->get();
+            return $incomes;
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+
 }
