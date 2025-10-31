@@ -25,19 +25,22 @@ class profileController extends Controller
         
         // Obtener detalles de los ingresos
         $incomes = $this->getUserIncome($userId);
+
+        $totalbalance = $totalDebt - $totalIncome;
         
         return response()->json([
             'success' => 1,
-            'message' => 'Datos del perfil obtenidos exitosamente',
             'user' => $user,
             'token_info' => [
                 'user_id' => $userId,
                 'expires_at' => auth('api')->payload()->get('exp')
             ],
             'financial_data' => [
+                'total_balance' => $totalbalance,
                 'total_debt' => $totalDebt,
                 'debt_count' => count($debts),
                 'debts' => $debts,
+               
                 'total_income' => $totalIncome,
                 'income_count' => count($incomes),
                 'incomes' => $incomes
@@ -76,7 +79,7 @@ class profileController extends Controller
                 ->where('user_id', $userId)
                 ->where('status', 'PENDING')
                 ->where('deb', '1')
-                ->select('id', 'description', 'amount', 'due_date', 'status')
+                ->select('id', 'description', 'amount', 'due_date', 'status', 'installments')
                 ->orderBy('due_date', 'asc')
                 ->get();
 
@@ -107,7 +110,7 @@ class profileController extends Controller
             $incomes = DB::table('debts')
                 ->where('user_id', $userId)
                 ->where('deb', '0')
-                ->select('id', 'description', 'amount', 'due_date', 'status')
+                ->select('id', 'description', 'amount', 'due_date', 'status', 'installments')
                 ->orderBy('due_date', 'asc')
                 ->get();
             return $incomes;
