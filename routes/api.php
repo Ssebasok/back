@@ -4,12 +4,11 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\profile\PasswordController;
-
+use App\Http\Controllers\Api\transaction\regTransactionController;
 use App\Http\Controllers\Api\profile\profileController;
 
 
 use App\Http\Requests\RegistationRequest;
-
 
 
 # verificacion de token
@@ -18,8 +17,13 @@ Route::middleware(['auth:api'])->group(function () {
     // Otras rutas protegidas...
 });
 
-// Las demás rutas quedan como están, sin JWT
 
+
+//transaction router
+
+Route::middleware(['auth:api'])->group(function () {
+    Route::post('/transaction/create', [regTransactionController::class, 'createTransaction']);
+});
 
 
 #Auth Routes
