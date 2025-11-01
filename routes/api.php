@@ -6,24 +6,35 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\profile\PasswordController;
 use App\Http\Controllers\Api\transaction\regTransactionController;
 use App\Http\Controllers\Api\profile\profileController;
+use App\Http\Controllers\Api\transaction\delTransactionController;
+
+
 
 
 use App\Http\Requests\RegistationRequest;
 
 
-# verificacion de token
+# Home 
 Route::middleware(['auth:api'])->group(function () {
     Route::get('/profile/home', [profileController::class, 'home']);
-    // Otras rutas protegidas...
 });
 
 
 
-//transaction router
+//transactions routes
 
 Route::middleware(['auth:api'])->group(function () {
     Route::post('/transaction/create', [regTransactionController::class, 'createTransaction']);
 });
+
+Route::middleware(['auth:api'])->group(function(){
+    Route::delete('/transaction/delete', [delTransactionController::class, 'deleteTransaction']);
+});
+
+//Route::middleware(['auth:api'])->group(function(){
+//    Route::update('/transaction/update', [updateTransactionController::class, 'updateTransaction']);
+//});
+
 
 
 #Auth Routes
